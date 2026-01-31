@@ -54,9 +54,6 @@ export async function initAudio(): Promise<void> {
                 // Add the sharp version alias (e.g. "C#3" -> "Db3.mp3")
                 // Tone.js uses sharps internally often, so we must alias them
                 if (note.includes('b')) {
-                    // Fix mapping for specific notes if needed, but simple replacement works for 
-                    // Db->D#, Eb->E# (wrong), wait.
-
                     // Proper enharmonic mapping:
                     let sharpName = '';
                     if (note === 'Db') sharpName = 'C#';
@@ -68,9 +65,15 @@ export async function initAudio(): Promise<void> {
                     if (sharpName) {
                         urls[`${sharpName}${oct}`] = fileName;
                     }
+                } else {
+                    // Also handle natural notes? No, natural notes don't have aliases usually unless E#->F
+                    // But we might want to ensure we have all bases covered.
                 }
             });
         });
+
+        // Debug: Log the first few URLs to verify path
+        console.log('Sample URLs created (sample):', Object.entries(urls).slice(0, 3));
 
         sampler = new Tone.Sampler({
             urls: urls,
@@ -200,16 +203,16 @@ export function getTransport(): typeof Tone.Transport {
 /**
  * Rhythm Pattern Definition
  */
-type RhythmStyle = 'bossa' | 'swing' | 'ballad' | 'latin' | 'samba' | 'waltz' | 'baiao';
+export type RhythmStyle = 'bossa' | 'swing' | 'ballad' | 'latin' | 'samba' | 'waltz' | 'baiao';
 
-interface RhythmEvent {
+export interface RhythmEvent {
     time: string; // '0:0:0' format
     type: 'bass' | 'chord' | 'all';
     duration: string;
     velocity: number;
 }
 
-const RHYTHM_PATTERNS: Record<RhythmStyle, RhythmEvent[]> = {
+export const RHYTHM_PATTERNS: Record<RhythmStyle, RhythmEvent[]> = {
     // Standard Bossa Nova Pattern (Clave feel)
     // Bass on 1 and 3 (approx)
     // Chords syncopated

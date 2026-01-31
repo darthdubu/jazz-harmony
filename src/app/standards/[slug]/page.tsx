@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { getStandardById } from '@/data/standards';
-import { getChordSymbol } from '@/lib/music/chords';
-import { getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
+import { getChordSymbol, type ChordType } from '@/lib/music/chords';
+import { getVoicingsForChord, getVoicingPositions, type Voicing } from '@/lib/music/voicings';
 import { transposeProgression } from '@/lib/music/progressions';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import Fretboard from '@/components/Fretboard/Fretboard';
@@ -27,9 +27,8 @@ export default function StandardDetailPage() {
     // Track which voicing is selected for the current chord
     const [voicingIndex, setVoicingIndex] = useState(0);
     const [showIntervals, setShowIntervals] = useState(false);
-    const [shuffleVoicings, setShuffleVoicings] = useState(false);
+    const [shuffleVoicings, setShuffleVoicings] = useState(true);
     const [transposeKey, setTransposeKey] = useState<string | null>(null);
-
     // Available keys for transposition
     const KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -41,6 +40,18 @@ export default function StandardDetailPage() {
 
     // Use transposed or original
     const displayStandard = transposedStandard || standard;
+
+    // Generate shuffled voicings for each unique chord on initial load
+    const voicingMap = useMemo(() => {
+        if (!displayStandard) return {};
+        const map: Record<string, Voicing[]> = {};
+        const uniqueChords = new Set(displayStandard.changes.map(c => `${c.root}-${c.type}`));
+        uniqueChords.forEach(key => {
+            const [root, type] = key.split('-');
+            map[key] = getVoicingsForChord(root, type as ChordType, shuffleVoicings);
+        });
+        return map;
+    }, [displayStandard, shuffleVoicings]);
 
     // Reset voicing index when chord changes
     useEffect(() => {
@@ -58,10 +69,10 @@ export default function StandardDetailPage() {
     const chordRoot = currentChord?.root || 'C';
     const chordType = currentChord?.type || 'maj7';
 
-    const voicings = useMemo(() =>
-        getVoicingsForChord(chordRoot, chordType, shuffleVoicings),
-        [chordRoot, chordType, shuffleVoicings]
-    );
+    const voicings = useMemo(() => {
+        const key = `${chordRoot}-${chordType}`;
+        return voicingMap[key] || [];
+    }, [chordRoot, chordType, voicingMap]);
     const currentVoicing = voicings[voicingIndex] || voicings[0];
     const positions = currentVoicing ? getVoicingPositions(currentVoicing, chordRoot) : [];
 

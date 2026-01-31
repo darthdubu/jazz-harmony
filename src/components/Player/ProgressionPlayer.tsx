@@ -15,6 +15,7 @@ import {
     getTransport,
 } from '@/lib/audio/player';
 import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
+import RhythmVisualizer from './RhythmVisualizer';
 
 interface ProgressionPlayerProps {
     onChordChange?: (chordIndex: number) => void;
@@ -292,6 +293,9 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
                     {isLooping ? 'On' : 'Off'}
                 </button>
             </div>
+
+            {/* Rhythm Visualization */}
+            <RhythmVisualizer style={currentProgression.style || 'swing'} />
 
             {/* Chord Timeline */}
             <div className="space-y-2">
