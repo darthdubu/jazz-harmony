@@ -4,9 +4,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { getStandardById, STANDARDS } from '@/data/standards';
-import { getChordSymbol, ChordType } from '@/lib/music/chords';
-import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
+import { getStandardById } from '@/data/standards';
+import { getChordSymbol } from '@/lib/music/chords';
+import { getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
 import { transposeProgression } from '@/lib/music/progressions';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import Fretboard from '@/components/Fretboard/Fretboard';
@@ -44,7 +44,7 @@ export default function StandardDetailPage() {
 
     // Reset voicing index when chord changes
     useEffect(() => {
-        setVoicingIndex(0);
+        setTimeout(() => setVoicingIndex(0), 0);
     }, [currentChordIndex]);
 
     useEffect(() => {
@@ -53,29 +53,17 @@ export default function StandardDetailPage() {
         }
     }, [standard, setProgression]);
 
-    if (!standard) {
-        return (
-            <div className="max-w-7xl mx-auto px-6 py-12 text-center">
-                <h1 className="font-display text-3xl text-gold mb-4">Standard Not Found</h1>
-                <p className="text-gray-400 mb-8">The requested progression could not be found.</p>
-                <Link href="/standards" className="text-gold hover:text-gold-light">
-                    ← Back to Standards
-                </Link>
-            </div>
-        );
-    }
-
+    // Get available voicings for this chord (shuffle toggle)
     const currentChord = displayStandard?.changes[currentChordIndex];
     const chordRoot = currentChord?.root || 'C';
     const chordType = currentChord?.type || 'maj7';
 
-    // Get available voicings for this chord (shuffle toggle)
     const voicings = useMemo(() =>
         getVoicingsForChord(chordRoot, chordType, shuffleVoicings),
         [chordRoot, chordType, shuffleVoicings]
     );
     const currentVoicing = voicings[voicingIndex] || voicings[0];
-    const positions = currentVoicing ? getVoicingPositions(currentVoicing, chordRoot, chordType) : [];
+    const positions = currentVoicing ? getVoicingPositions(currentVoicing, chordRoot) : [];
 
     const nextVoicing = () => {
         if (voicings.length > 1) {
@@ -88,6 +76,18 @@ export default function StandardDetailPage() {
             setVoicingIndex((prev) => (prev - 1 + voicings.length) % voicings.length);
         }
     };
+
+    if (!standard) {
+        return (
+            <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+                <h1 className="font-display text-3xl text-gold mb-4">Standard Not Found</h1>
+                <p className="text-gray-400 mb-8">The requested progression could not be found.</p>
+                <Link href="/standards" className="text-gold hover:text-gold-light">
+                    ← Back to Standards
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-12">

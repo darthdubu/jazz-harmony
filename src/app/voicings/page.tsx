@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    CHORD_TYPES,
     CHORD_DISPLAY_NAMES,
     getChordSymbol,
     ChordType
 } from '@/lib/music/chords';
 import { NOTE_NAMES } from '@/lib/music/notes';
-import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
+import { getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
 import Fretboard from '@/components/Fretboard/Fretboard';
 
 const CHORD_CATEGORIES = {
@@ -30,11 +29,11 @@ export default function VoicingsPage() {
     // Get voicings for current chord
     const voicings = getVoicingsForChord(selectedRoot, selectedType);
     const currentVoicing = voicings[voicingIndex] || voicings[0];
-    const positions = currentVoicing ? getVoicingPositions(currentVoicing, selectedRoot, selectedType) : [];
+    const positions = currentVoicing ? getVoicingPositions(currentVoicing, selectedRoot) : [];
 
     // Reset voicing index when chord changes
     useEffect(() => {
-        setVoicingIndex(0);
+        setTimeout(() => setVoicingIndex(0), 0);
     }, [selectedRoot, selectedType]);
 
     const chordSymbol = getChordSymbol(selectedRoot, selectedType);
@@ -224,7 +223,7 @@ export default function VoicingsPage() {
                             <div>
                                 <h3 className="text-white font-bold mb-2">Absolute Symmetry</h3>
                                 <p>
-                                    In standard tuning, the B-string creates a "warp" that breaks interval patterns.
+                                    In standard tuning, the B-string creates a &quot;warp&quot; that breaks interval patterns.
                                     In Major Thirds (E-G#-C-E-G#-C), every adjacent string pair is a Major 3rd.
                                     This means <strong>every chord shape is identical</strong> regardless of which string set you play it on.
                                 </p>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CircleOfFifths } from './CircleOfFifths';
 import Fretboard from '../Fretboard/Fretboard';
-import { NOTES, M3_TUNING } from '@/lib/music/notes';
+import { NOTES } from '@/lib/music/notes';
 
 // Simple logic to get scale notes for visualization
 // In a real app, use a dedicated music theory library
@@ -54,14 +54,21 @@ const getScalePositions = (rootNote: string) => {
     return positions;
 };
 
+const ORDER_OF_FIFTHS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+
+interface Position {
+    string: number;
+    fret: number;
+    note: string;
+    interval: string;
+    isRoot: boolean;
+}
+
 export default function FretboardCycles() {
     const [activeKey, setActiveKey] = useState('C');
-    const [positions, setPositions] = useState<any[]>([]);
+    const [positions, setPositions] = useState<Position[]>([]);
     const [cycleType, setCycleType] = useState<'5ths' | '4ths' | '2nds'>('5ths');
     const [isPlaying, setIsPlaying] = useState(false);
-
-    // Order of keys in the Circle of Fifths (Clockwise)
-    const ORDER_OF_FIFTHS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
 
     useEffect(() => {
         setPositions(getScalePositions(activeKey));
@@ -165,7 +172,7 @@ export default function FretboardCycles() {
             </div>
 
             <p className="text-xs text-gray-600 text-center">
-                Click any key on the circle to see its scale. Use "Play Cycle" to animate.
+                Click any key on the circle to see its scale. Use &quot;Play Cycle&quot; to animate.
             </p>
         </div>
     );

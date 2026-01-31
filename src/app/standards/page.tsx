@@ -103,15 +103,15 @@ export default function StandardsPage() {
 
             {/* Standards Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredStandards.map((standard, index) => (
-                    <motion.div
-                        key={standard.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "50px" }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <Link href={`/standards/${standard.id}`}>
+                    {filteredStandards.map((standard) => (
+                        <motion.div
+                            key={standard.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "50px" }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Link href={`/standards/${standard.id}`}>
                             <div className="bg-surface-dark rounded-xl p-6 card-hover h-full flex flex-col">
                                 <div className="flex items-start justify-between mb-4">
                                     <span className="tag">{standard.style}</span>

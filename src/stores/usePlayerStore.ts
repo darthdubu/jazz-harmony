@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { Progression, ChordChange } from '@/lib/music/progressions';
+import { Voicing } from '@/lib/music/voicings';
 
 interface PlayerState {
     // Current progression
     currentProgression: Progression | null;
     currentChordIndex: number;
-    currentVoicing: any | null; // Using any to avoid circular dependency issues, effectively Voicing type
+    currentVoicing: Voicing | null; // Using any to avoid circular dependency issues, effectively Voicing type
 
     // Playback state
     isPlaying: boolean;
@@ -19,7 +20,7 @@ interface PlayerState {
     // Actions
     setProgression: (progression: Progression) => void;
     setCurrentChordIndex: (index: number) => void;
-    setCurrentVoicing: (voicing: any | null) => void;
+    setCurrentVoicing: (voicing: Voicing | null) => void;
     nextChord: () => void;
     previousChord: () => void;
 

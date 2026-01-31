@@ -2,7 +2,7 @@
 // Practical voicings STRICTLY constrained to 4-fret span for playability
 // Up to 8 voicings per chord type
 
-import { ChordType, CHORD_TYPES } from './chords';
+import { ChordType } from './chords';
 import { M3_TUNING_MIDI, noteToSemitone, semitoneToNote } from './notes';
 
 export interface Voicing {
@@ -266,7 +266,7 @@ export function getVoicingsForChord(root: string, type: ChordType, randomize: bo
 /**
  * Get the fret positions for a voicing with note and interval info
  */
-export function getVoicingPositions(voicing: Voicing, root: string, type: ChordType): {
+export function getVoicingPositions(voicing: Voicing, root: string): {
     string: number;
     fret: number;
     note: string;

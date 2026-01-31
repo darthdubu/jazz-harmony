@@ -1,7 +1,8 @@
 
 import { Progression, ChordChange } from '../lib/music/progressions';
+import { ChordType } from '../lib/music/chords';
 
-function c(root: string, type: any, bar: number, beat: number = 1, duration: number = 4): ChordChange {
+function c(root: string, type: ChordType, bar: number, beat: number = 1, duration: number = 4): ChordChange {
     return { root, type, bar, beat, duration };
 }
 

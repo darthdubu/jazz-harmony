@@ -1,13 +1,12 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getChordSymbol, ChordType } from '@/lib/music/chords';
-import { usePlayerStore } from '@/stores/usePlayerStore';
-import { getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
-import { playChord, playNote, stopAll } from '@/lib/audio/player';
+import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
+import { playChord } from '@/lib/audio/player';
 import Fretboard from '@/components/Fretboard/Fretboard';
 
 // Diatonic chords for Major and Minor keys
@@ -35,11 +34,19 @@ const MINOR_SCALE_DEGREES = [
 const KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 const NOTE_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+interface FretPosition {
+    string: number;
+    fret: number;
+    note: string;
+    interval: string;
+    isRoot: boolean;
+}
+
 export default function DiatonicTrainer() {
     const [selectedKey, setSelectedKey] = useState('C');
     const [selectedMode, setSelectedMode] = useState<'Major' | 'Minor'>('Major');
     const [activeDegreeIndex, setActiveDegreeIndex] = useState<number | null>(null);
-    const [positions, setPositions] = useState<any[]>([]); // Using any[] for simplicity, or import FretPosition type if strictly needed
+    const [positions, setPositions] = useState<FretPosition[]>([]); // Using any[] for simplicity, or import FretPosition type if strictly needed
 
     const scaleDegrees = selectedMode === 'Major' ? MAJOR_SCALE_DEGREES : MINOR_SCALE_DEGREES;
 
@@ -73,10 +80,10 @@ export default function DiatonicTrainer() {
 
                 // Sort voicings by closest average fret
                 const sorted = [...voicings].sort((a, b) => {
-                    const getAvg = (v: any) => {
-                        const fs = v.frets.filter((f: number | null) => f !== null && f > 0);
+                    const getAvg = (v: Voicing) => {
+                        const fs = v.frets.filter((f: number | null) => f !== null && f > 0) as number[];
                         if (fs.length === 0) return 0;
-                        return fs.reduce((sum: number, f: number) => sum + f, 0) / fs.length;
+                        return fs.reduce((sum, f) => sum + f, 0) / fs.length;
                     };
                     return Math.abs(getAvg(a) - prevAvg) - Math.abs(getAvg(b) - prevAvg);
                 });
@@ -89,8 +96,8 @@ export default function DiatonicTrainer() {
                 // or just the default one.
                 // Let's pick one around fret 3-5 for start
                 const sorted = [...voicings].sort((a, b) => {
-                    const getAvg = (v: any) => {
-                        const fs = v.frets.filter((f: number | null) => f !== null && f > 0);
+                    const getAvg = (v: Voicing) => {
+                        const fs = v.frets.filter((f: number | null) => f !== null && f > 0) as number[];
                         if (fs.length === 0) return 0;
                         return fs.reduce((sum: number, f: number) => sum + f, 0) / fs.length;
                     };
@@ -101,7 +108,7 @@ export default function DiatonicTrainer() {
 
 
             // Convert voicing to notes to play
-            const newPositions = getVoicingPositions(selectedVoicing, root, degree.type);
+            const newPositions = getVoicingPositions(selectedVoicing, root);
 
             // Map to notes for audio
             // M3 Tuning octaves

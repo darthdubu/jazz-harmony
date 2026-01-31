@@ -27,7 +27,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     useEffect(() => {
         if (!supabase) {
-            setLoading(false);
+            setTimeout(() => setLoading(false), 0);
             return;
         }
 

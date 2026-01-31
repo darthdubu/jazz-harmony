@@ -54,7 +54,6 @@ export async function initAudio(): Promise<void> {
                 // Add the sharp version alias (e.g. "C#3" -> "Db3.mp3")
                 // Tone.js uses sharps internally often, so we must alias them
                 if (note.includes('b')) {
-                    const sharpNote = note.replace('b', '#'); // Simple conversion
                     // Fix mapping for specific notes if needed, but simple replacement works for 
                     // Db->D#, Eb->E# (wrong), wait.
 
@@ -296,7 +295,7 @@ export function scheduleMeasure(
 
     pattern.forEach(event => {
         // Parse time "bar:beat:sixteenth" -> we only care about beat:sixteenth relative to measureStart
-        const [_, beat, sixteenth] = event.time.split(':').map(Number);
+        const [, beat, sixteenth] = event.time.split(':').map(Number);
 
         // Calculate offset in beats
         const beatOffset = beat + (sixteenth * 0.25);

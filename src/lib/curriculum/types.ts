@@ -4,7 +4,7 @@ export interface ContentBlock {
     id: string;
     type: ContentBlockType;
     content: string; // Text content or JSON string for complex data
-    metadata?: any; // Extra props like { positions: [...], progressionId: '...' }
+    metadata?: Record<string, unknown>; // Extra props like { positions: [...], progressionId: '...' }
 }
 
 export interface Lesson {
@@ -16,7 +16,7 @@ export interface Lesson {
     order: number;
 }
 
-export interface Module {
+export interface CourseModule {
     id: string;
     title: string;
     description: string;
@@ -29,6 +29,6 @@ export interface Course {
     title: string;
     description: string;
     level: 'Beginner' | 'Intermediate' | 'Advanced';
-    modules: Module[];
+    modules: CourseModule[];
     tags: string[];
 }

@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { JAZZ_HARMONY_COURSE } from '@/lib/curriculum/data';
 import { useProgressStore } from '@/stores/useProgressStore';
 import Fretboard from '@/components/Fretboard/Fretboard';
@@ -27,11 +26,11 @@ const MarkdownBlock = ({ content }: { content: string }) => {
 export default function LessonPage() {
     const params = useParams(); // courseId, moduleId, lessonId
     const router = useRouter();
-    const { markLessonComplete, isLessonCompleted, setCurrentLocation, completedLessons } = useProgressStore();
+    const { markLessonComplete, isLessonCompleted, setCurrentLocation } = useProgressStore();
 
     const course = JAZZ_HARMONY_COURSE;
-    const module = course.modules.find(m => m.id === params.moduleId);
-    const lesson = module?.lessons.find(l => l.id === params.lessonId);
+    const courseModule = course.modules.find(m => m.id === params.moduleId);
+    const lesson = courseModule?.lessons.find(l => l.id === params.lessonId);
 
     // Update current location on mount
     useEffect(() => {
@@ -44,7 +43,7 @@ export default function LessonPage() {
         }
     }, [params, setCurrentLocation]);
 
-    if (!module || !lesson) return <div>Lesson not found</div>;
+    if (!courseModule || !lesson) return <div>Lesson not found</div>;
 
     const isComplete = isLessonCompleted(lesson.id);
 

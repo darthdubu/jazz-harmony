@@ -84,7 +84,7 @@ export const useFlowStore = create<FlowState>()(
                 const newRecentAttempts = [...state.recentAttempts, { success, time: now }].slice(-20);
 
                 // Update Session
-                let newSession = state.currentSession ? { ...state.currentSession } : null;
+                const newSession = state.currentSession ? { ...state.currentSession } : null;
                 if (newSession) {
                     newSession.attempts++;
                     if (success) {
@@ -170,7 +170,7 @@ export const useFlowStore = create<FlowState>()(
         }),
         {
             name: 'flow-state-storage',
-            partialize: (state) => ({ 
+            partialize: () => ({ 
                 // Don't persist session data, only maybe preferences if we had them
             }), 
         }

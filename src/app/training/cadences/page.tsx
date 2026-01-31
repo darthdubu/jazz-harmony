@@ -16,7 +16,7 @@ export default function CadenceTrainer() {
     const [selectedCadenceId, setSelectedCadenceId] = useState(CADENCES[0].id);
     const [selectedKey, setSelectedKey] = useState('C');
 
-    const { currentChordIndex, setProgression, currentProgression, currentVoicing } = usePlayerStore();
+    const { currentChordIndex, setProgression, currentVoicing } = usePlayerStore();
 
     // Find current cadence definition
     const cadenceDef = CADENCES.find(c => c.id === selectedCadenceId) || CADENCES[0];
@@ -54,8 +54,8 @@ export default function CadenceTrainer() {
     const displayVoicing = currentVoicing || getVoicingsForChord(currentChord.root, currentChord.type)[0];
 
     const positions = useMemo(() =>
-        displayVoicing ? getVoicingPositions(displayVoicing, currentChord.root, currentChord.type) : [],
-        [displayVoicing, currentChord.root, currentChord.type]);
+        displayVoicing ? getVoicingPositions(displayVoicing, currentChord.root) : [],
+        [displayVoicing, currentChord.root]);
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-12">

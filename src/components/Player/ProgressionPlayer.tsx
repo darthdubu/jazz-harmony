@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import * as Tone from 'tone';
 import { usePlayerStore } from '@/stores/usePlayerStore';
-import { getChordNotes, getChordSymbol, ChordType } from '@/lib/music/chords';
+import { getChordNotes, getChordSymbol } from '@/lib/music/chords';
 import {
     initAudio,
-    isAudioReady,
     scheduleMeasure,
     startTransport,
     stopTransport,
     clearSchedule,
     setTempo,
     getTransport,
-    playChord,
 } from '@/lib/audio/player';
 import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
 
@@ -23,7 +21,7 @@ interface ProgressionPlayerProps {
     progressionId?: string;
 }
 
-export default function ProgressionPlayer({ onChordChange, progressionId }: ProgressionPlayerProps) {
+export default function ProgressionPlayer({ progressionId }: ProgressionPlayerProps) {
     const {
         currentProgression,
         currentChordIndex,
@@ -36,7 +34,6 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
         nextChord,
         previousChord,
         setCurrentChordIndex,
-        setProgression, // We need to expose this from store (it likely exists as setProgression or similar, checking store would be ideal but guessing standard pattern)
     } = usePlayerStore();
 
     // Check store for setProgression, actually I need to verify store capability.
@@ -50,11 +47,12 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
     useEffect(() => {
         if (progressionId) {
             // Dynamic import to avoid circular dep if any, or just standard import
-            const { getStandardById } = require('@/data/standards');
-            const prog = getStandardById(progressionId);
-            if (prog) {
-                usePlayerStore.getState().setProgression(prog);
-            }
+            import('@/data/standards').then(({ getStandardById }) => {
+                const prog = getStandardById(progressionId);
+                if (prog) {
+                    usePlayerStore.getState().setProgression(prog);
+                }
+            });
         }
     }, [progressionId]);
 
@@ -108,7 +106,7 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
                 voicing = voicings[0];
 
                 // Convert voicing to notes
-                const positions = getVoicingPositions(voicing, chord.root, chord.type);
+                const positions = getVoicingPositions(voicing, chord.root);
                 // Map positions to notes with octaves
                 // We need to be careful about octaves. 
                 // getVoicingPositions returns note names (e.g. "C"). 
@@ -121,8 +119,6 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
                 // String 3 (E) is E3.
                 // String 4 (G#) is G#3.
                 // String 5 (C) is C4.
-
-                const M3_OPEN_OCTAVES = [2, 2, 3, 3, 3, 4]; // corresponding to E, G#, C, E, G#, C
 
                 notes = positions.map(p => {
                     // note: p.string is 0-5.
@@ -186,7 +182,7 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
         if (isPlaying) {
             setTempo(tempo);
         }
-    }, [tempo]);
+    }, [tempo, isPlaying]);
 
     // Cleanup
     useEffect(() => {
@@ -202,7 +198,7 @@ export default function ProgressionPlayer({ onChordChange, progressionId }: Prog
             stopTransport();
             setIsPlaying(false);
         }
-    }, [currentProgression]);
+    }, [currentProgression, isPlaying, setIsPlaying]);
 
     if (!currentProgression) {
         return (

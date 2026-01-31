@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { getAllStandards } from '@/data/standards';
-import { getChordSymbol } from '@/lib/music/chords';
 import Fretboard from '@/components/Fretboard/Fretboard';
 
 export default function Home() {
@@ -72,11 +71,11 @@ export default function Home() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-gold text-xl">✓</span>
-                <span className="text-gray-400">Intervals are visual: A Major 3rd is always "Down 1 String, Back 1 Fret".</span>
+                <span className="text-gray-400">Intervals are visual: A Major 3rd is always &quot;Down 1 String, Back 1 Fret&quot;.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-gold text-xl">✓</span>
-                <span className="text-gray-400">Zero "compensation" for the B-string.</span>
+                <span className="text-gray-400">Zero &quot;compensation&quot; for the B-string.</span>
               </li>
             </ul>
           </motion.div>
@@ -166,7 +165,7 @@ export default function Home() {
             </p>
             <p className="text-gray-400 mb-6 leading-relaxed">
               You can play <strong>any scale, any chord, and any melody</strong> without stretching your fingers more than one fret per finger.
-              It's ergonomically perfect.
+              It&apos;s ergonomically perfect.
             </p>
             <Link href="/curriculum/jazz-harmony-fundamentals/grade-1/chromatic-box" className="text-gold font-bold hover:underline">
               Try the Box Exercise →

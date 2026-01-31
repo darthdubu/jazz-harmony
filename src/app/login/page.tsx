@@ -60,7 +60,7 @@ export default function LoginPage() {
                 });
                 error = res.error;
                 if (!error) {
-                    router.push('/curriculum');
+                    router.push('/dashboard');
                     router.refresh();
                 }
             }

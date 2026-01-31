@@ -9,9 +9,7 @@ import { PracticePartner } from '@/lib/flow-state/partner';
 export default function FlowManager() {
     const {
         isInFlow,
-        currentSession,
         emotionalState,
-        startSession
     } = useFlowStore();
 
     const [toast, setToast] = useState<{
@@ -25,7 +23,7 @@ export default function FlowManager() {
     // Initial Greeting + First Fact
     useEffect(() => {
         const greeting = PracticePartner.getGreeting(null, 'exploratory');
-        setToast({ message: greeting, type: 'partner' });
+        setTimeout(() => setToast({ message: greeting, type: 'partner' }), 0);
 
         // Auto-dismiss greeting
         const greetingTimer = setTimeout(() => {
@@ -71,7 +69,7 @@ export default function FlowManager() {
         if (emotionalState !== 'engaged') {
             const msg = PracticePartner.getEncouragement(emotionalState);
             if (msg) {
-                setToast({ message: msg, type: 'partner' });
+                setTimeout(() => setToast({ message: msg, type: 'partner' }), 0);
                 setTimeout(() => setToast(null), 6000);
             }
         }
@@ -80,7 +78,7 @@ export default function FlowManager() {
     // React to Flow State
     useEffect(() => {
         if (isInFlow) {
-            setToast({ message: "You're in the zone 🌊", type: 'flow' });
+            setTimeout(() => setToast({ message: "You're in the zone 🌊", type: 'flow' }), 0);
             setTimeout(() => setToast(null), 4000);
         }
     }, [isInFlow]);

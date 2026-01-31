@@ -1,6 +1,6 @@
 // Chord definitions and voicing calculations for jazz harmony
 
-import { noteToSemitone, semitoneToNote, transposeNote, M3_TUNING_MIDI, NOTE_NAMES } from './notes';
+import { noteToSemitone, semitoneToNote, transposeNote, M3_TUNING_MIDI } from './notes';
 
 // Chord formulas as intervals from root (in semitones)
 export const CHORD_TYPES = {

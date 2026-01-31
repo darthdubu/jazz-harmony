@@ -67,7 +67,7 @@ export function formatProgression(progression: Progression): string {
         barChords[change.bar - 1].push(getChangeSymbol(change));
     }
 
-    return barChords.map((bar, i) => `|${bar.join(' ')}`).join(' ') + '|';
+    return barChords.map((bar) => `|${bar.join(' ')}`).join(' ') + '|';
 }
 
 // ii-V-I patterns commonly used in jazz

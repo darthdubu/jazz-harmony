@@ -1,4 +1,4 @@
-import { NOTE_NAMES, noteToSemitone, semitoneToNote } from './notes';
+import { noteToSemitone, semitoneToNote } from './notes';
 
 export interface Mode {
     name: string;

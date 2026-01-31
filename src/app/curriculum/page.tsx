@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { JAZZ_HARMONY_COURSE } from '@/lib/curriculum/data';
 import { useProgressStore } from '@/stores/useProgressStore';
 

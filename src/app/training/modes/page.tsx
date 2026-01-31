@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
 import { MODES, getScaleNotes } from '@/lib/music/scales';
 import { noteToSemitone, M3_TUNING_MIDI, semitoneToNote } from '@/lib/music/notes';
 import Fretboard from '@/components/Fretboard/Fretboard';
@@ -10,6 +10,14 @@ import { playNote, playChord, stopAll } from '@/lib/audio/player';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import { ChordType } from '@/lib/music/chords';
 import { Voicing, getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
+
+interface FretPosition {
+    string: number;
+    fret: number;
+    note: string;
+    interval: string;
+    isRoot: boolean;
+}
 
 const KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -25,8 +33,8 @@ export default function ModesTrainer() {
 
     // Calculate Fretboard scales positions
     // We want to show the full scale across the neck
-    const getScalePositions = () => {
-        const positions: any[] = [];
+    const getScalePositions = useCallback(() => {
+        const positions: FretPosition[] = [];
 
         let minFret = 0;
         let maxFret = 15;
@@ -82,17 +90,17 @@ export default function ModesTrainer() {
             }
         }
         return positions;
-    };
+    }, [selectedKey, selectedMode, selectedPosition, scaleNotes]);
 
-    const positions = useMemo(() => getScalePositions(), [selectedKey, selectedMode, selectedPosition]);
+    const positions = useMemo(() => getScalePositions(), [getScalePositions]);
 
     const playScale = async () => {
         stopAll();
         // Play ascending scale
         // Construct notes in order starting from C3 approx
-        const notesToPlay = scaleNotes.map((n, i) => {
+        scaleNotes.forEach((n) => {
             // Simple octave logic
-            return `${n}3`;
+            // ...
         });
         // This is a bit dumb/short.
         // Better: play up one octave.
