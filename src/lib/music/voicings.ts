@@ -109,10 +109,10 @@ const VOICING_TEMPLATES: Record<ChordType, Voicing[]> = {
     ],
 
     '6': [
-        { id: '6-shell-a', name: 'Shell (R-3-6)', type: '6', frets: [null, null, 0, 4, 1, null], rootString: 2, category: 'shell', difficulty: 1 },
-        { id: '6-shell-b', name: 'Shell (R-6-3)', type: '6', frets: [null, 0, 1, null, 4, null], rootString: 1, category: 'shell', difficulty: 1 },
-        { id: '6-closed-a', name: 'Closed', type: '6', frets: [0, 4, 3, 1, null, null], rootString: 0, category: 'closed', difficulty: 2 },
-        { id: '6-drop2-a', name: 'Drop 2', type: '6', frets: [null, 0, 3, 4, 1, null], rootString: 1, category: 'drop2', difficulty: 2 },
+        { id: '6-shell-a', name: 'Shell (R-3-6)', type: '6', frets: [null, null, 0, 0, 1, null], rootString: 2, category: 'shell', difficulty: 1 },
+        { id: '6-shell-b', name: 'Shell (R-3-6)', type: '6', frets: [null, 4, 4, 5, null, null], rootString: 1, category: 'shell', difficulty: 1 },
+        { id: '6-closed-a', name: 'Closed (5-R-3-6)', type: '6', frets: [3, 4, 4, 5, null, null], rootString: 0, category: 'closed', difficulty: 2 },
+        { id: '6-drop2-a', name: 'Drop 2 (6-3-5-R)', type: '6', frets: [5, 8, 7, 8, null, null], rootString: 0, category: 'drop2', difficulty: 2 },
     ],
 
     '6/9': [
