@@ -5,7 +5,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { M3_TUNING } from '@/lib/music/notes';
 
-interface FretPosition {
+export interface FretPosition {
     string: number;
     fret: number;
     note: string;

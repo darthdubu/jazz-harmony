@@ -7,112 +7,114 @@ let sampler: Tone.Sampler | null = null;
 let reverb: Tone.Reverb | null = null;
 let isInitialized = false;
 let isLoading = false;
+let initPromise: Promise<void> | null = null;
 
 /**
  * Initialize the audio context and sampler with real acoustic guitar samples
  * Must be called from a user interaction (click) due to browser autoplay policies
  */
-export async function initAudio(): Promise<void> {
-    if (isInitialized || isLoading) return;
+export function initAudio(): Promise<void> {
+    if (isInitialized) return Promise.resolve();
+    if (initPromise) return initPromise;
+
     isLoading = true;
 
-    await Tone.start();
+    initPromise = new Promise(async (resolve) => {
+        await Tone.start();
 
-    // Warm reverb for jazz club ambience
-    reverb = new Tone.Reverb({
-        decay: 3,
-        wet: 0.2, // Slightly more wet for guitar
-        preDelay: 0.01
-    }).toDestination();
+        // Warm reverb for jazz club ambience
+        reverb = new Tone.Reverb({
+            decay: 3,
+            wet: 0.2, // Slightly more wet for guitar
+            preDelay: 0.01
+        }).toDestination();
 
-    // Use local acoustic guitar samples (downloaded from gleitz/midi-js-soundfonts)
-    const baseUrl = '/samples/guitar/';
+        // Use local acoustic guitar samples (downloaded from gleitz/midi-js-soundfonts)
+        const baseUrl = '/samples/guitar/';
 
-    try {
-        // Create sample map for full range
-        const notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-        const octaves = [2, 3, 4, 5, 6];
-        const urls: Record<string, string> = {};
+        try {
+            // Create sample map for full range
+            const notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+            const octaves = [2, 3, 4, 5, 6];
+            const urls: Record<string, string> = {};
 
-        // Add A1, Bb1, B1 explicitly
-        urls['A1'] = 'A1.mp3';
-        urls['Bb1'] = 'Bb1.mp3';
-        urls['B1'] = 'B1.mp3';
+            // Add A1, Bb1, B1 explicitly
+            urls['A1'] = 'A1.mp3';
+            urls['Bb1'] = 'Bb1.mp3';
+            urls['B1'] = 'B1.mp3';
 
-        // Add rest of chromatic scale
-        octaves.forEach(oct => {
-            notes.forEach(note => {
-                // Skip anything above C6 if it doesn't exist
-                if (oct === 6 && note !== 'C') return;
+            // Add rest of chromatic scale
+            octaves.forEach(oct => {
+                notes.forEach(note => {
+                    // Skip anything above C6 if it doesn't exist
+                    if (oct === 6 && note !== 'C') return;
 
-                const noteName = `${note}${oct}`;
-                const fileName = `${noteName}.mp3`;
+                    const noteName = `${note}${oct}`;
+                    const fileName = `${noteName}.mp3`;
 
-                // Add the flat version (e.g. "Db3")
-                urls[noteName] = fileName;
+                    // Add the flat version (e.g. "Db3")
+                    urls[noteName] = fileName;
 
-                // Add the sharp version alias (e.g. "C#3" -> "Db3.mp3")
-                // Tone.js uses sharps internally often, so we must alias them
-                if (note.includes('b')) {
-                    // Proper enharmonic mapping:
-                    let sharpName = '';
-                    if (note === 'Db') sharpName = 'C#';
-                    else if (note === 'Eb') sharpName = 'D#';
-                    else if (note === 'Gb') sharpName = 'F#';
-                    else if (note === 'Ab') sharpName = 'G#';
-                    else if (note === 'Bb') sharpName = 'A#';
+                    // Add the sharp version alias (e.g. "C#3" -> "Db3.mp3")
+                    if (note.includes('b')) {
+                        let sharpName = '';
+                        if (note === 'Db') sharpName = 'C#';
+                        else if (note === 'Eb') sharpName = 'D#';
+                        else if (note === 'Gb') sharpName = 'F#';
+                        else if (note === 'Ab') sharpName = 'G#';
+                        else if (note === 'Bb') sharpName = 'A#';
 
-                    if (sharpName) {
-                        urls[`${sharpName}${oct}`] = fileName;
+                        if (sharpName) {
+                            urls[`${sharpName}${oct}`] = fileName;
+                        }
                     }
-                } else {
-                    // Also handle natural notes? No, natural notes don't have aliases usually unless E#->F
-                    // But we might want to ensure we have all bases covered.
+                });
+            });
+
+            // Debug: Log the first few URLs to verify path
+            console.log('Sample URLs created (sample):', Object.entries(urls).slice(0, 3));
+
+            sampler = new Tone.Sampler({
+                urls: urls,
+                baseUrl: baseUrl,
+                release: 1,
+                onload: () => {
+                    console.log('Guitar samples loaded successfully');
+                    isInitialized = true;
+                    isLoading = false;
+                    resolve();
+                },
+                onerror: (error) => {
+                    console.error('Error loading guitar samples:', error);
+                    isLoading = false;
+                    // Don't block UI if audio fails
+                    isInitialized = true;
+                    resolve();
                 }
             });
-        });
 
-        // Debug: Log the first few URLs to verify path
-        console.log('Sample URLs created (sample):', Object.entries(urls).slice(0, 3));
+            sampler.volume.value = -3;
+            if (reverb) sampler.connect(reverb);
 
-        sampler = new Tone.Sampler({
-            urls: urls,
-            baseUrl: baseUrl,
-            release: 1,
-            onload: () => {
-                console.log('Guitar samples loaded successfully');
-                isInitialized = true;
-                isLoading = false;
-            },
-            onerror: (error) => {
-                console.error('Error loading guitar samples:', error);
-                isLoading = false;
-                // Don't block UI if audio fails
-                isInitialized = true;
-            }
-        });
-
-        sampler.volume.value = -3;
-        sampler.connect(reverb);
-
-        // Add a low-pass filter to warm up the nylon sound further?
-        // const filter = new Tone.Filter(2000, "lowpass").toDestination();
-        // sampler.connect(filter);
-
-    } catch (err) {
-        console.error("Failed to initialize sampler:", err);
-        isInitialized = true; // Allow app to continue just without sound
-        isLoading = false;
-    }
-
-    // Safety timeout - mark as initialized after 5 seconds even if onload doesn't fire
-    setTimeout(() => {
-        if (!isInitialized) {
-            console.log('Audio initialized via timeout (fallback)');
-            isInitialized = true;
+        } catch (err) {
+            console.error("Failed to initialize sampler:", err);
+            isInitialized = true; // Allow app to continue just without sound
             isLoading = false;
+            resolve();
         }
-    }, 5000);
+
+        // Safety timeout - mark as initialized after 5 seconds even if onload doesn't fire
+        setTimeout(() => {
+            if (!isInitialized) {
+                console.log('Audio initialized via timeout (fallback)');
+                isInitialized = true;
+                isLoading = false;
+                resolve();
+            }
+        }, 5000);
+    });
+
+    return initPromise;
 }
 
 /**

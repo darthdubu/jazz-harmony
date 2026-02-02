@@ -21,7 +21,7 @@ export default function LoginPage() {
         setMessage(null);
 
         if (!supabase) {
-            setMessage({ type: 'error', text: 'Supabase is not configured.' });
+            setMessage({ type: 'error', text: 'Authentication service is not configured.' });
             setLoading(false);
             return;
         }
@@ -68,7 +68,7 @@ export default function LoginPage() {
             if (error) {
                 setMessage({ type: 'error', text: error.message });
             }
-        } catch (err) {
+        } catch (_) {
             setMessage({ type: 'error', text: 'An unexpected error occurred.' });
         }
 

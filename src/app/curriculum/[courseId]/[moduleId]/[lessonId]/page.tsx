@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { JAZZ_HARMONY_COURSE } from '@/lib/curriculum/data';
 import { useProgressStore } from '@/stores/useProgressStore';
-import Fretboard from '@/components/Fretboard/Fretboard';
+import Fretboard, { FretPosition } from '@/components/Fretboard/Fretboard';
 import ProgressionPlayer from '@/components/Player/ProgressionPlayer';
 import FretboardCycles from '@/components/Tools/FretboardCycles';
 import M3GeometryTrainer from '@/components/Training/M3GeometryTrainer';
@@ -47,17 +47,17 @@ export default function LessonPage() {
 
     const isComplete = isLessonCompleted(lesson.id);
 
-    // Logic for "Next Lesson"
+// Logic for "Next Lesson"
     const handleComplete = () => {
         markLessonComplete(lesson.id);
         // Find next lesson
-        const currentLessonIdx = module.lessons.findIndex(l => l.id === lesson.id);
-        if (currentLessonIdx < module.lessons.length - 1) {
-            const nextLesson = module.lessons[currentLessonIdx + 1];
-            router.push(`/curriculum/${course.id}/${module.id}/${nextLesson.id}`);
+        const currentLessonIdx = courseModule.lessons.findIndex(l => l.id === lesson.id);
+        if (currentLessonIdx < courseModule.lessons.length - 1) {
+            const nextLesson = courseModule.lessons[currentLessonIdx + 1];
+            router.push(`/curriculum/${course.id}/${courseModule.id}/${nextLesson.id}`);
         } else {
             // Find next module?
-            const currentModuleIdx = course.modules.findIndex(m => m.id === module.id);
+            const currentModuleIdx = course.modules.findIndex(m => m.id === courseModule.id);
             if (currentModuleIdx < course.modules.length - 1) {
                 const nextModule = course.modules[currentModuleIdx + 1];
                 const nextLesson = nextModule.lessons[0];
@@ -76,7 +76,7 @@ export default function LessonPage() {
             {/* Header */}
             <div className="mb-8 border-b border-white/10 pb-6">
                 <div className="text-xs text-gold font-bold uppercase tracking-wider mb-2">
-                    {module.title}
+                    {courseModule.title}
                 </div>
                 <h1 className="text-4xl font-display font-bold text-white mb-4">{lesson.title}</h1>
                 <p className="text-xl text-gray-400">{lesson.description}</p>
@@ -98,10 +98,10 @@ export default function LessonPage() {
                                 <Fretboard
                                     showNotes={true}
                                     showIntervals={true}
-                                    positions={block.metadata?.positions || []}
+                                    positions={(block.metadata?.positions as FretPosition[] || [])}
                                 />
                                 <div className="text-center text-xs text-gray-500 mt-2">
-                                    {block.metadata?.caption || 'Interactive Visualization'}
+                                    {block.metadata?.caption as string || 'Interactive Visualization'}
                                 </div>
                             </div>
                         )}
@@ -120,7 +120,7 @@ export default function LessonPage() {
 
                         {block.type === 'video' && (
                             <div className="bg-surface-dark border border-white/5 rounded-xl overflow-hidden">
-                                <div className="aspect-w-16 aspect-h-9 relative pb-[56.25%] bg-black">
+                                <div className="relative pb-[56.25%] bg-black">
                                     <iframe
                                         src={`https://www.youtube.com/embed/${block.content}`}
                                         title="Lesson Video"
@@ -129,7 +129,7 @@ export default function LessonPage() {
                                         allowFullScreen
                                     ></iframe>
                                 </div>
-                                {block.metadata?.caption && (
+                                {typeof block.metadata?.caption === 'string' && (
                                     <div className="p-4 text-sm text-gray-400 border-t border-white/5 bg-surface-light/5">
                                         🎥 <strong>Watch:</strong> {block.metadata.caption}
                                     </div>

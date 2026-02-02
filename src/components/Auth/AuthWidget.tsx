@@ -7,9 +7,9 @@ import { isAuthEnabled } from '@/lib/supabase/client';
 
 export default function AuthWidget() {
     const { user, signOut, loading } = useAuth();
-    const enabled = isAuthEnabled();
+    // const enabled = isAuthEnabled();
 
-    if (!enabled) return null; // Don't show if not configured
+    // if (!enabled) return null; // Don't show if not configured
     if (loading) return <div className="animate-pulse w-8 h-8 bg-white/10 rounded-full"></div>;
 
     if (user) {

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { getStandardById } from '@/data/standards';
 import { getChordSymbol, type ChordType } from '@/lib/music/chords';
+import { getScaleDegree } from '@/lib/music/analysis';
 import { getVoicingsForChord, getVoicingPositions, type Voicing } from '@/lib/music/voicings';
 import { transposeProgression } from '@/lib/music/progressions';
 import { usePlayerStore } from '@/stores/usePlayerStore';
@@ -270,6 +271,9 @@ export default function StandardDetailPage() {
                                                 {chord.bar}
                                             </span>
                                         )}
+                                        <span className="absolute -top-2 right-1 text-xs text-gold/50 font-sans">
+                                            {getScaleDegree(chord.root, chord.type, displayStandard.key)}
+                                        </span>
                                         <span className={index === currentChordIndex ? 'font-bold' : 'text-gray-300'}>
                                             {getChordSymbol(chord.root, chord.type)}
                                         </span>

@@ -6,10 +6,18 @@ import Link from 'next/link';
 import { MODES, getScaleNotes } from '@/lib/music/scales';
 import { noteToSemitone, M3_TUNING_MIDI, semitoneToNote } from '@/lib/music/notes';
 import Fretboard from '@/components/Fretboard/Fretboard';
-import { playNote, playChord, stopAll } from '@/lib/audio/player';
+import {
+    // playChord,
+    playNote,
+    stopAll
+} from '@/lib/audio/player';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import { ChordType } from '@/lib/music/chords';
-import { Voicing, getVoicingsForChord, getVoicingPositions } from '@/lib/music/voicings';
+import {
+    getVoicingsForChord,
+    getVoicingPositions,
+    // Voicing
+} from '@/lib/music/voicings';
 
 interface FretPosition {
     string: number;
@@ -27,7 +35,7 @@ export default function ModesTrainer() {
 
     const [selectedPosition, setSelectedPosition] = useState<'all' | 'pos1' | 'pos2' | 'pos3' | 'pos4'>('pos1');
 
-    const { setProgression, setIsPlaying, isPlaying } = usePlayerStore();
+    const { setProgression, setIsPlaying } = usePlayerStore();
 
     const scaleNotes = getScaleNotes(selectedKey, selectedMode.name);
 
@@ -98,16 +106,10 @@ export default function ModesTrainer() {
         stopAll();
         // Play ascending scale
         // Construct notes in order starting from C3 approx
-        scaleNotes.forEach((n) => {
-            // Simple octave logic
-            // ...
-        });
-        // This is a bit dumb/short.
-        // Better: play up one octave.
-
+        
         let time = 0;
         for (const note of scaleNotes) {
-            playNote(`${note}3`, '4n', time); // ERROR expected: check player.ts, likely missing time arg support or diff order
+            playNote(`${note}3`, '4n', time); 
             time += 0.5;
         }
         playNote(`${scaleNotes[0]}4`, '2n', time);

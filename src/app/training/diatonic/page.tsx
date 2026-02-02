@@ -6,6 +6,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getChordSymbol, ChordType } from '@/lib/music/chords';
 import { getVoicingsForChord, getVoicingPositions, Voicing } from '@/lib/music/voicings';
+// import {
+//     M3_TUNING_NOTES,
+//     // M3_OPEN_OCTAVES
+// } from '@/lib/music/notes';
 import { playChord } from '@/lib/audio/player';
 import Fretboard from '@/components/Fretboard/Fretboard';
 

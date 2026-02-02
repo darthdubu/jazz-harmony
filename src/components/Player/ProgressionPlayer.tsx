@@ -152,13 +152,15 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
                 }, drawTime);
             }, `${currentBar}:0:0`);
 
-            currentBar += (duration / 4);
+            currentBar += duration;
         });
 
-        // Loop handling
-        const totalDuration = currentBar; // in bars
-        getTransport().setLoopPoints(0, `${totalDuration}:0:0`);
-        getTransport().loop = isLooping;
+        if (isLooping) {
+            getTransport().setLoopPoints(0, `${currentBar}:0:0`);
+            getTransport().loop = true;
+        } else {
+            getTransport().loop = false;
+        }
     };
 
     // Handle play/pause
@@ -209,7 +211,8 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
         );
     }
 
-    const currentChord = currentProgression.changes[currentChordIndex];
+    const hasChords = currentProgression.changes && currentProgression.changes.length > 0;
+    const currentChord = hasChords ? currentProgression.changes[currentChordIndex] : null;
 
     return (
         <div className="bg-surface-dark rounded-xl p-6 space-y-6">
@@ -222,11 +225,11 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
                     className="inline-block"
                 >
                     <span className="text-6xl font-display font-bold text-gold">
-                        {currentChord ? getChordSymbol(currentChord.root, currentChord.type) : '--'}
+                        {currentChord ? getChordSymbol(currentChord.root, currentChord.type) : (hasChords ? '--' : 'N/A')}
                     </span>
                 </motion.div>
                 <p className="text-gray-400 mt-2">
-                    Bar {currentChord?.bar} • Beat {currentChord?.beat}
+                    {hasChords ? `Bar ${currentChord?.bar} • Beat ${currentChord?.beat}` : 'No chord data available'}
                 </p>
             </div>
 
@@ -234,7 +237,8 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
             <div className="flex items-center justify-center gap-4">
                 <button
                     onClick={previousChord}
-                    className="p-3 rounded-full bg-surface hover:bg-surface-light transition-colors"
+                    disabled={!hasChords}
+                    className="p-3 rounded-full bg-surface hover:bg-surface-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
@@ -242,8 +246,9 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
                 </button>
 
                 <button
-                    onClick={togglePlay}
-                    className="p-4 rounded-full bg-gold text-background hover:bg-gold-light transition-colors"
+                    onClick={hasChords ? togglePlay : undefined}
+                    disabled={!hasChords}
+                    className="p-4 rounded-full bg-gold text-background hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isPlaying ? (
                         <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
@@ -258,7 +263,8 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
 
                 <button
                     onClick={() => { nextChord(); }}
-                    className="p-3 rounded-full bg-surface hover:bg-surface-light transition-colors"
+                    disabled={!hasChords}
+                    className="p-3 rounded-full bg-surface hover:bg-surface-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
@@ -295,7 +301,7 @@ export default function ProgressionPlayer({ progressionId }: ProgressionPlayerPr
             </div>
 
             {/* Rhythm Visualization */}
-            <RhythmVisualizer style={currentProgression.style || 'swing'} />
+            <RhythmVisualizer style={currentProgression?.style || 'swing'} />
 
             {/* Chord Timeline */}
             <div className="space-y-2">
