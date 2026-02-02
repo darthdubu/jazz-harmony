@@ -26,15 +26,51 @@ export default function VoicingsPage() {
     const [showNotes, setShowNotes] = useState(true);
     const [showIntervals, setShowIntervals] = useState(false);
 
+    // Randomize initial voicing on mount
+    useEffect(() => {
+        // Pick a random root
+        const randomRoot = NOTE_NAMES[Math.floor(Math.random() * NOTE_NAMES.length)];
+        
+        // Pick a random type
+        const allTypes = Object.values(CHORD_CATEGORIES).flat();
+        const randomType = allTypes[Math.floor(Math.random() * allTypes.length)] as ChordType;
+        
+        setSelectedRoot(randomRoot);
+        setSelectedType(randomType);
+        
+        // Get voicings for this combination to pick a random index
+        const availableVoicings = getVoicingsForChord(randomRoot, randomType);
+        if (availableVoicings.length > 0) {
+            setVoicingIndex(Math.floor(Math.random() * availableVoicings.length));
+        }
+    }, []);
+
     // Get voicings for current chord
     const voicings = getVoicingsForChord(selectedRoot, selectedType);
     const currentVoicing = voicings[voicingIndex] || voicings[0];
     const positions = currentVoicing ? getVoicingPositions(currentVoicing, selectedRoot) : [];
 
-    // Reset voicing index when chord changes
-    useEffect(() => {
-        setTimeout(() => setVoicingIndex(0), 0);
-    }, [selectedRoot, selectedType]);
+    // Reset voicing index when chord changes (only if not initial load)
+    // We need a ref to track if it's the initial load to avoid overriding the random selection
+    // Actually, the random selection happens in useEffect [], which runs AFTER the initial render.
+    // The initial state is C maj7.
+    // When the effect runs, it updates state.
+    // This effect below will also run when state updates.
+    // We want to avoid resetting index to 0 if we just randomized it.
+    
+    // Simplest way: The randomization sets root/type/index together.
+    // But this effect watches root/type.
+    // If we change root/type via UI, we want index 0.
+    // If we change it via randomizer, we want random index.
+    
+    // Let's use a flag for user interaction?
+    // Or just let the randomizer set the state, and if this effect runs, it might reset to 0.
+    // Wait, if I set root, type AND index in the same render cycle (batch), 
+    // the dependency [selectedRoot, selectedType] will trigger.
+    
+    // Let's remove the auto-reset effect and handle it in the click handlers.
+    // That is cleaner and avoids fighting with the randomizer.
+
 
     const chordSymbol = getChordSymbol(selectedRoot, selectedType);
 
@@ -74,7 +110,10 @@ export default function VoicingsPage() {
                             {NOTE_NAMES.map(note => (
                                 <button
                                     key={note}
-                                    onClick={() => setSelectedRoot(note)}
+                                    onClick={() => {
+                                        setSelectedRoot(note);
+                                        setVoicingIndex(0);
+                                    }}
                                     className={`p-2 rounded text-center font-mono transition-colors ${selectedRoot === note
                                         ? 'bg-gold text-background'
                                         : 'bg-surface hover:bg-surface-light text-gray-300'
@@ -97,7 +136,10 @@ export default function VoicingsPage() {
                                         {types.map(type => (
                                             <button
                                                 key={type}
-                                                onClick={() => setSelectedType(type as ChordType)}
+                                                onClick={() => {
+                                                    setSelectedType(type as ChordType);
+                                                    setVoicingIndex(0);
+                                                }}
                                                 className={`px-3 py-1 rounded text-sm font-mono transition-colors ${selectedType === type
                                                     ? 'bg-gold text-background'
                                                     : 'bg-surface hover:bg-surface-light text-gray-300'
